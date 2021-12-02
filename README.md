@@ -1,1 +1,1 @@
-<center> NDHU_ImageProcessing</center>
+<center><strong> NDHU_ImageProcessing</strong></center>
