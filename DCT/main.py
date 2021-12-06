@@ -191,7 +191,17 @@ def transform(img):
     saveImage(dct_img, adjust_img, img - adjust_img)
 
 
+def psnr(img, adjust_img):
+    mse = 0
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            tmp = (img[i][j] - adjust_img[i][j])
+            mse += np.power(tmp, 2)
+    mse /= (img.shape[0] * img.shape[1])
 
+    Max = 255 * 255
+    val = 10 * np.log10((Max / mse))
+    print("PSNR:",val)
 
 
 # read the photo
@@ -200,6 +210,7 @@ img = cv2.imread('lena.jpg')
 # convert to gray
 img = convert_to_gray(img)
 transform(img)
+
 
 
 
