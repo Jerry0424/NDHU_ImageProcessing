@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 import math
-
+from PIL import Image
 # Quantization List
 q = [
         [16, 11, 10, 16, 24, 40, 51, 61],
@@ -189,6 +189,8 @@ def transform(img):
     dct_img = np.round(dct_img)
 
     saveImage(dct_img, adjust_img, img - adjust_img)
+    psnr(img, adjust_img)
+    #return adjust_img
 
 
 def psnr(img, adjust_img):
@@ -206,10 +208,33 @@ def psnr(img, adjust_img):
 
 # read the photo
 img = cv2.imread('lena.jpg')
-
-# convert to gray
 img = convert_to_gray(img)
 transform(img)
+
+
+
+
+
+
+'''
+# 
+rgbArray = np.zeros((512,512,3), 'uint8')
+rgbArray[..., 0] = transform(img[:,:,0])
+print(rgbArray)
+rgbArray[..., 1] = transform(img[:,:,1])
+print(rgbArray)
+rgbArray[..., 2] = transform(img[:,:,2])
+img = Image.fromarray(rgbArray)
+img.save('myimg.jpg')
+'''
+
+
+
+
+
+
+
+
 
 
 
