@@ -1,7 +1,29 @@
+'''
+1. change the given image to grayscale. Thus,image scale will be converted from (512,512,3) to (512,512)
+    solution 1 : use convert_to_gray function
+
+Following steps are packed in transform function
+
+    2. get the specific 8x8 field on image to do dct processing
+        solution 2:  use get8x8matrix function to divide the submatrix
+    3. do dct processing
+        solution 3: use dct + dct processing functions
+    4 quantization
+        solution 4: use quantization function
+    5 dequantization
+        solution 5: use dequantization function
+    6. do dct processing
+        solution 6: use idct + idct processing functions
+    7. save the image
+         solution 7: use saveImage function
+    8. count psnr
+        solution 8: use psnr function in which we follow the psnr formula to compute the psnr value
+'''
+
+
 import numpy as np
 import cv2
 import math
-from PIL import Image
 # Quantization List
 q = [
         [16, 11, 10, 16, 24, 40, 51, 61],
@@ -31,6 +53,7 @@ def get8x8matrix(img,row_num, col_num):
     # create a 8x8 matrix to store the targeted submatrix of origin image and use it do dct processing
     dct = np.zeros((8,8))
 
+    # copy the targeted 8x8 field on original image to a submatrix
     dct_i = 0
     for i in range(row_bound - 8,row_bound):
         dct_j = 0
@@ -41,7 +64,7 @@ def get8x8matrix(img,row_num, col_num):
 
     return dct
 
-
+# use quantization list to do quantization
 def quantization(matrix):
     for i in range(matrix.shape[0]):
         for j in range(matrix.shape[1]):
@@ -49,6 +72,7 @@ def quantization(matrix):
 
     return matrix
 
+# use quantization list to do dequantization
 def dequantization(matrix):
     for i in range(matrix.shape[0]):
         for j in range(matrix.shape[1]):
@@ -60,7 +84,7 @@ def dequantization(matrix):
 
 # whole dct process -> function dct + function dctProcess
 def dct(matrix):
-    # set a matrix to store values computed by the dct processing
+    # set a matrix to store values computed during the dct processing
     dct = np.zeros((8, 8))
 
     # subtract 128 for avoiding overflow
@@ -108,7 +132,7 @@ def idct(dct):
         for y in range(8):
             idct[x][y] = idctProcess(dct, x, y)
 
-    # plus 128
+    # plus 128 back since we subtract 128 before doing dct processing
     idct += 128
     return idct
 
@@ -138,7 +162,6 @@ def adjust(img, row_num, col_num, matrix):
     row_bound = row_num * 8
     col_bound = col_num * 8
 
-
     matrix_i = 0
     for i in range(row_bound - 8, row_bound):
         matrix_j = 0
@@ -151,8 +174,11 @@ def adjust(img, row_num, col_num, matrix):
 
 
 def saveImage(dct, idct, error):
+    # save dct image
     cv2.imwrite('dct_transform.jpg', dct)
+    # save idct image
     cv2.imwrite('idct.jpg', idct)
+    # save error image
     cv2.imwrite('error_image.jpg',error)
 
 
@@ -161,14 +187,17 @@ def saveImage(dct, idct, error):
 def transform(img):
     # devide the origin image into several 8x8 matrix to do dct processing
     col,row = img.shape[1],img.shape[0]
+    # get the maximum number of the submarix in row and column
     col_num = int(col / 8)
     row_num = int(row / 8)
-
+    # copy the original image to help us doing dct processing instead of using original image directly
     img_copy = img.copy()
     img_copy_2 = img.copy()
+    # creat zero 512x512 matrix to save values computed during dct processing
     adjust_img = np.zeros((row, col))
     dct_img = np.zeros((row, col))
 
+    # make each 8x8 submatrix  do dct processing one by one
     for i in range(row_num):
         for j in range(col_num):
             # get the targeted 8x8 submatrix to do dct processing
@@ -188,11 +217,12 @@ def transform(img):
     adjust_img = np.round(adjust_img)
     dct_img = np.round(dct_img)
 
+    # save the asked image such as dct image , idct image , error image
     saveImage(dct_img, adjust_img, img - adjust_img)
+    # count the psnr value
     psnr(img, adjust_img)
-    #return adjust_img
 
-
+# compute the psnr formula
 def psnr(img, adjust_img):
     mse = 0
     for i in range(img.shape[0]):
@@ -203,12 +233,14 @@ def psnr(img, adjust_img):
 
     Max = 255 * 255
     val = 10 * np.log10((Max / mse))
-    print("PSNR:",val)
+    print("PSNR val is :",val)
 
 
 # read the photo
 img = cv2.imread('lena.jpg')
+# convert to gray
 img = convert_to_gray(img)
+# Do all process
 transform(img)
 
 
@@ -216,17 +248,7 @@ transform(img)
 
 
 
-'''
-# 
-rgbArray = np.zeros((512,512,3), 'uint8')
-rgbArray[..., 0] = transform(img[:,:,0])
-print(rgbArray)
-rgbArray[..., 1] = transform(img[:,:,1])
-print(rgbArray)
-rgbArray[..., 2] = transform(img[:,:,2])
-img = Image.fromarray(rgbArray)
-img.save('myimg.jpg')
-'''
+
 
 
 
