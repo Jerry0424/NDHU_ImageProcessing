@@ -46,10 +46,18 @@ not_indata_img_name = []
 read_image(not_indata_img, not_indata_img_name, path)
 
 
-index = random.randint(0,4)
-print(index)
-print(indata_img_name[index])
+index = random.randint(0, 4)
+
+print("Chosen image in database is " + " : " + str(indata_img_name[index]))
 x = cosin_Sim(image, indata_img, index)
 
+print("================================================================")
+print("Comparison Result")
+print("================================================================")
 for i in range(len(x)):
-    print(image_name[i] + " : "+ str(x[i]))
+    print(image_name[i] + " : " + str(x[i]))
+print("================================================================")
+print("End Comparison")
+print("================================================================")
+min_index = x.index(min(x))
+print("The person in chosen image is : " + str(image_name[min_index]))
