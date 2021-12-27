@@ -3,13 +3,13 @@ import os
 from pathlib import Path
 
 
-# read the train image
+# read the train images and resize all to 160x160 form
 # store the image in img_arr
 # store the person's name in name_arr
 def read_image(img_arr, name_arr,path):
-
     for filename in os.listdir(path):
         img = cv2.imread(path + "/" + filename)
+        img = img.resize((160, 160))
         img_arr.append(img)
         name = Path(filename).stem
         name_arr.append(name)
@@ -36,7 +36,6 @@ not_indata_img_name = []
 read_image(not_indata_img, not_indata_img_name, path)
 
 
-for i in range(len(not_indata_img_name)):
-    print(not_indata_img_name[i])
+
 
 
