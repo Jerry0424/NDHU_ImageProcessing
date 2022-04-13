@@ -1,3 +1,3 @@
-# This repository is for the image processing homework
+# All contents included is related to introduction of image processing cousre
 
- <strong>Each file contain a single project</strong>
+ <strong>Each file contains a single project</strong>
