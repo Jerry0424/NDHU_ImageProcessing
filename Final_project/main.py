@@ -1,10 +1,21 @@
+"""
+1.Build three arrays to store the image in train, in database and not in database files respectively.
+2.Build another three arrays to store the name of each image in train, in database and not in database files respectively.
+3.use read image function to input all images
+4.use comparison function to do comparison
+    4-1.Use the random function to choose a tested image in in database or not in database file at a time.
+    4-2.Compare the chosen image with all images in train file.
+        PS: Use the cosin similarity function to do the comparison
+    4-3.Output the comparison result
+        PS: The minimum value within all output values will be the closest answer for the chosen image.
+"""
 import cv2
 import os
 from pathlib import Path
 from scipy.spatial import distance
 import random
 
-# read the train images , resize them to 160x160 form and change all to grayscale
+# read the train images , resize them to 256x256 form and change all to grayscale
 # store the image in img_arr
 # store the person's name in name_arr
 def read_image(img_arr, name_arr,path):
@@ -14,6 +25,30 @@ def read_image(img_arr, name_arr,path):
         img_arr.append(img)
         name = Path(filename).stem
         name_arr.append(name)
+# function do comparison
+def comparison(basic_arr,basic_name_arr,img_arr, name_arr):
+    img = random.choice(name_arr)
+    index = name_arr.index(img)
+    print("Person in chosen image is " + " : " + str(img))
+    # do cosin similarity comparison between train images and one of images in indatabase file or not in database file
+    x = cosin_Sim(basic_arr, img_arr, index)
+    # show the comparison result and do the prediction
+    print("================================================================")
+    print("Comparison Result")
+    print("================================================================")
+    for i in range(len(x)):
+        print(basic_name_arr[i] + " : " + str(x[i]))
+    print("================================================================")
+    print("End Comparison")
+    print("================================================================")
+    min_index = x.index(min(x))
+    if(min(x)== 0):
+        print("The person in chosen image is : " + str(basic_name_arr[min_index]))
+    else:
+        print("The person in chosen image most likely be: " + str(basic_name_arr[min_index]))
+
+    print("-------Complete one case----------")
+
 
 # do the cosin similarity
 def cosin_Sim(image, img, index):
@@ -23,7 +58,6 @@ def cosin_Sim(image, img, index):
         res.append(distance.cosine(image[i].flatten(), img[index].flatten()))
 
     return res
-
 
 
 # read the train image
@@ -46,40 +80,8 @@ not_indata_img = []
 not_indata_img_name = []
 read_image(not_indata_img, not_indata_img_name, path)
 
-# in database check
-index = random.randint(0, 4)
-print("Chosen image in database is " + " : " + str(indata_img_name[index]))
-# do cosin similarity comparison between train images and one of images in indatabase file
-x = cosin_Sim(image, indata_img, index)
-# show the comparsion result and do the prediction
-print("================================================================")
-print("Comparison Result")
-print("================================================================")
-for i in range(len(x)):
-    print(image_name[i] + " : " + str(x[i]))
-print("================================================================")
-print("End Comparison")
-print("================================================================")
-min_index = x.index(min(x))
-print("The person in chosen image is : " + str(image_name[min_index]))
 
-print("----------------------------------------------------------------")
-
-
-# not in database check
-index = random.randint(0, 4)
-
-print("Chosen image not in database is " + " : " + str(not_indata_img_name[index]))
-# do cosin similarity comparison between train images and one of images in not in database file
-y = cosin_Sim(image, not_indata_img, index)
-# show the comparsion result and do the prediction
-print("================================================================")
-print("Comparison Result")
-print("================================================================")
-for i in range(len(y)):
-    print(image_name[i] + " : " + str(y[i]))
-print("================================================================")
-print("End Comparison")
-print("================================================================")
-min_index = y.index(min(y))
-print("The person in chosen image most likely be: " + str(image_name[min_index]))
+# in database image comparison
+comparison(image, image_name, indata_img, indata_img_name)
+# not in database image comparison
+comparison(image, image_name, not_indata_img, not_indata_img_name)
